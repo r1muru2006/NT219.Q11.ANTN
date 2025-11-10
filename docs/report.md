@@ -51,7 +51,7 @@ The objective for weeks 3–4 was to implement and evaluate a proof-of-concept (
 **Author note:** This report is a reproducible summary of the initial implementation. See the `README.md` in `experiments/exp_des_bruteforce` for detailed commands and parameter tuning.
 # DES Brute-Force Attack Setup
 
-## To demonstrate the feasibility and cost of brute-forcing the DES cipher, we designed a controlled experiment using both CPU-based Python scripts and GPU-accelerated Hashcat. The setup replicates a realistic scenario where the attacker possesses a known plaintext–ciphertext pair and attempts to recover the original 56-bit DES key.
+- To demonstrate the feasibility and cost of brute-forcing the DES cipher, we designed a controlled experiment using both CPU-based Python scripts and GPU-accelerated Hashcat. The setup replicates a realistic scenario where the attacker possesses a known plaintext–ciphertext pair and attempts to recover the original 56-bit DES key.
 
 ## 1. Environment
 

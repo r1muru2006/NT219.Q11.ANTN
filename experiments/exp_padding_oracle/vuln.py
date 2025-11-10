@@ -1,11 +1,13 @@
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
+from Crypto.Util.Padding import unpad, pad
 import sys
 import os
 
 
+FLAG = open("/flag", "r").read().encode()
 KEY = os.urandom(16)
-FLAG = open("/flag", "r").read()
+iv = os.urandom(16)
+ct = AES.new(KEY, AES.MODE_CBC, iv).encrypt(pad(FLAG, 16))
 
 # send iv||ct to decrypt
 def cbc_decrypt(ct):
@@ -19,12 +21,12 @@ def cbc_decrypt(ct):
 def challenge():
     ct = bytes.fromhex(input("Send ciphertext (hex): "))
     try:
-        if ct < AES.block_size * 2:
+        if len(ct) < AES.block_size * 2:
             print(b"Length of ciphertext not valid for CBC mode.")
             return
         
         pt = cbc_decrypt(ct)
-        if pt.decode() == FLAG:
+        if pt.decode(errors='ignore') == FLAG:
             print(f"Correct! Here is your flag: {FLAG}")
         else:
             print("Nope, try again!")
@@ -36,5 +38,10 @@ def challenge():
 
 if __name__ == "__main__": 
     print("---Welcome to the Padding Oracle Challenge!---")
+    print("Here is the data given for you!!!")
+    given = (iv + ct).hex()
+    print(f'iv||ct: {given}')
+    
+    print("Now it's your turn to break this")
     while True:
         challenge()

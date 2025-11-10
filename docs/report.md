@@ -169,31 +169,70 @@ A working CPU demo that recovers keys in small keyspaces (time and throughput re
 A Hashcat GPU run showing keys/sec and estimated time for full 2^56 search (and cost estimates if run on cloud GPU instances).
 
 An analysis paragraph concluding the practical infeasibility/cost of brute-forcing DES in production and recommending migration to AES/AEAD.
-# Padding Oracle Experiment — Summary
 
+# Week 5-6 Report — Padding Oracle Attack & How to patch it
 
-## Objective
-Demonstrate CBC-PKCS7 padding oracle, measure resources, and patch.
+# Padding Oracle Attack Experiment (CBC-PKCS7)
 
+To demonstrate the **severity** and **resource cost** of the **Padding Oracle vulnerability** within the **AES-CBC** encryption mode (using PKCS7 Padding), we established a controlled experimental environment that simulates a real-world attack and measures key performance metrics.
 
-## Method
-- Deployed vulnerable AES-CBC server (distinct error on bad padding).
-- Attacker script uses oracle to recover plaintext block-by-block.
-- Metrics: number of requests, time per block, retries.
+## 1. Experimental Environment Setup
 
+The environment was designed to clearly observe the behavior of the "Oracle"—the server that provides different error responses based on padding validity.
 
-## Results (example)
-- Ciphertext blocks: 3 (IV + 2 data blocks)
-- Total oracle requests: 7680 (approx)
-- Wall time: ~2 minutes on localhost
+| Component | Role | Technical Configuration |
+| :--- | :--- | :--- |
+| **Server** | Vulnerable Target | Ubuntu Docker service; AES-CBC-256; PKCS7 Padding; **Distinguishable errors** for `Integrity Error` vs. `Padding Error` |
+| **Attack Script** | Attacker Tooling | Python `pwntools` + `block-by-block` of Padding Oracle logic attack|
+| **Monitoring** | Metric Collection | Wall Time clock, Request Counter, Latency statistics |
 
+**Prerequisite:** The attacker must possess a valid **Ciphertext** and **Initialization Vector (IV)**.
 
-## Patch & Retest
-- Applied Encrypt-then-MAC (HMAC-SHA256): oracle removed; attack fails.
-- Applied AES-GCM: attack fails; provides confidentiality+integrity.
+## 2. Attack Methodology (Block-by-Block Recovery)
 
+The attack script exploits the server's varying error responses. It works backward from the last byte of an encrypted block to the first, utilizing the CBC decryption formula: $P_i = D_K(C_i) \oplus C_{i-1}$.
 
-## Recommendations
-1. Use AEAD (AES-GCM / ChaCha20-Poly1305) for protocols.
-2. If CBC must be used, adopt Encrypt-then-MAC and constant-time generic errors.
-3. Log attempts and rate-limit decryption endpoints.
+1.  **Objective:** Decrypt a data block $C_i$ by modifying the preceding block $C_{i-1}$ (or the IV if $i=1$).
+2.  **Technique:** The attacker iterates through 256 possible values for the target padding byte (e.g., the 16th byte) in the modified block $C_{i-1}'$.
+3.  **Oracle:** When the server returns valid padding, the attacker has found a valid padding byte, allowing the calculation of the corresponding plaintext byte.
+4.  **Iteration:** This process is repeated 16 times per ciphertext block until the entire plaintext is recovered.
+
+## 3. Measured Results (Typical Scenario)
+
+These metrics illustrate the **low cost** of data recovery in an ideal environment (low latency).
+
+| Parameter | Example Value | Notes |
+| :--- | :--- | :--- |
+| **Ciphertext Blocks** | 5 (1 IV + 4 Data Blocks) | Requires 4 full runs to recover 4 data blocks. |
+| **Total Oracle Requests** | $\approx ...$ (approx) | Roughly $\approx 128 \times N_{bytes}$ requests. |
+| **Wall Time** | $\approx ...$ minutes (Localhost) | Recovery of **64 bytes** of data (4 blocks). |
+| **Success Rate** | $100\%$ | Attack successful against the leaky server. |
+
+> **Note:** The request count is approximately $128 \times N_{bytes}$ because on average, the attacker finds the correct byte after 128 tries.
+
+---
+
+## 4. Patching and Retesting
+
+We applied the following defensive measures and confirmed that they successfully eliminated the "Oracle," causing the attack to fail.
+
+### 4.1. Encrypt-then-MAC Implementation
+
+* **Change:** Applied a **HMAC-SHA256** after encryption. The server now checks the MAC before decryption and padding validation.
+* **Result:** The attacker consistently receives a `MAC/Integrity Error` **before** the padding check is performed. **Oracle eliminated.**
+
+### 4.2. Migration to AEAD (AES-GCM)
+
+* **Change:** Switched from AES-CBC to **AES-GCM** (or ChaCha20-Poly1305).
+* **Result:** AES-GCM is an **Authenticated Encryption with Associated Data (AEAD)** mode. The integrity check (GCM Tag) is performed **before** any decryption operation. **Attack failed** as the ciphertext could not be manipulated without invalidating the Tag.
+
+---
+
+## 5. Recommendations and Defensive Guidance
+
+These recommendations are aimed at completely preventing Padding Oracle attacks and related vulnerabilities.
+
+1.  **Prioritize AEAD:** Always use **AEAD** encryption modes (such as **AES-GCM** or **ChaCha20-Poly1305**) to ensure both **Confidentiality** and **Integrity** of data.
+2.  **For Legacy CBC:** If AES-CBC must be used, it must strictly follow the **Encrypt-then-MAC** model (the only secure composition for CBC).
+3.  **Uniform Errors:** Ensure the server **always returns a single, generic error message** for all decryption/authentication failures (MAC/Padding/Length), and use **constant-time response timing** to prevent information leakage via Side Channel Timing.
+4.  **Monitoring & Rate-Limiting:** **Log** unusual volumes of failed decryption requests and apply strict **rate-limiting** on decryption endpoints to make attacks requiring thousands of attempts computationally infeasible.

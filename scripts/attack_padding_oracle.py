@@ -1,4 +1,4 @@
-# Tên file: attack.py
+
 from pwn import *
 from Crypto.Cipher import AES
 import os 

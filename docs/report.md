@@ -204,8 +204,8 @@ These metrics illustrate the **low cost** of data recovery in an ideal environme
 | Parameter | Example Value | Notes |
 | :--- | :--- | :--- |
 | **Ciphertext Blocks** | 5 (1 IV + 4 Data Blocks) | Requires 4 full runs to recover 4 data blocks. |
-| **Total Oracle Requests** | $\approx ...$ (approx) | Roughly $\approx 128 \times N_{bytes}$ requests. |
-| **Wall Time** | $\approx ...$ minutes (Localhost) | Recovery of **64 bytes** of data (4 blocks). |
+| **Total Oracle Requests** | $\approx 8021$ (approx) | Requests are sent to server. |
+| **Wall Time** | $\approx 38.3424$ seconds (Localhost) | Recovery of **64 bytes** of data (4 blocks). |
 | **Success Rate** | $100\%$ | Attack successful against the leaky server. |
 
 > **Note:** The request count is approximately $128 \times N_{bytes}$ because on average, the attacker finds the correct byte after 128 tries.

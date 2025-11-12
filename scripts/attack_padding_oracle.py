@@ -1,5 +1,6 @@
 # -------------------LIBRARY-------------------
 from pwn import *
+import time
 
 # -------------------HIDDEN WARNING-------------------
 import warnings
@@ -8,6 +9,7 @@ warnings.filterwarnings("ignore", category=BytesWarning)
 # -------------------CORE ATTACK-------------------
 
 BLOCK_SIZE = 16
+COUNT = 0
 
 def unpad(data, blocksize=BLOCK_SIZE):
     pad_len = data[-1]
@@ -19,10 +21,11 @@ def unpad(data, blocksize=BLOCK_SIZE):
 
 def single_block_attack(iv, ciphertext, oracle):
     after_decrypt = b""
-
+    global COUNT
     for i in reversed(range(16)):
         padding = bytes([16 - i] * (16 - i))
         for ch in range(256):
+            COUNT += 1
             _iv = bytes(i) + xor(padding, bytes([ch]) + after_decrypt)
 
             if oracle(_iv, ciphertext):
@@ -34,14 +37,17 @@ def single_block_attack(iv, ciphertext, oracle):
 
 def full_attack(iv, ciphertext, oracle):
     plaintext = b""
-
+    print("\n------Starting the recovery process------")
+    start = time.time()
     for i in range(0, len(ciphertext), BLOCK_SIZE):
         block = single_block_attack(iv, ciphertext[i : i + BLOCK_SIZE], oracle)
         plaintext += block
         iv = ciphertext[i : i + BLOCK_SIZE]
-        print(f'Successfully attack block {i // 16 + 1}: {unpad(block, 16).decode()}')
-
-    return plaintext
+        print(f'Successfully recovering block {i // 16 + 1}: {unpad(block, 16).decode()}')
+    end = time.time()
+    print("---DONE---\n")
+    finish_time = end - start
+    return plaintext, finish_time
 
 
 # -------------------CONNECT AND ATTACK-------------------
@@ -75,7 +81,10 @@ if __name__ == "__main__":
     print("--------Let's break this server!!!--------")
     print(f"This is the initialization vector (hex): {iv.hex()}")
     print(f"This is the ciphertext (hex): {ct.hex()}")
-
-    pt = full_attack(iv, ct, check_service)
+    
+    pt, time_taken = full_attack(iv, ct, check_service)
     flag = unpad(pt, 16)
-    print(f"Here is the recovered data: {flag.decode()}")
+    
+    print(f"Total Oracle Requests: {COUNT} requests")
+    print(f"Wall Time: {(time_taken):.4f} seconds\n")
+    print(f"Here is the recovered data: {flag.decode(errors='ignore')}\n")

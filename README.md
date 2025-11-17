@@ -23,19 +23,18 @@ In practice, however, **AES is rarely broken by its underlying mathematics**. Su
 * **Key:** 56-bit (effective).
 * **Block:** 64-bit.
 * **Issues:** The 56-bit key size is trivially **vulnerable to brute-force** by modern hardware. The 64-bit block size is also a weakness, leading to "Sweet32" collision attacks on 3DES when encrypting large amounts of data.
-
+![images](https://www.zenarmor.com/docs/assets/images/3-3d35f2c1cf731b1f458799f4b0d5338e.png)
 ### 2.2. AES (Advanced Encryption Standard)
 * **Structure:** Substitution-Permutation Network (SPN).
 * **Key:** 128, 192, or 256-bit.
 * **Block:** 128-bit.
 * **Strength:** Theoretically, no practical attack against full-round AES is more efficient than brute-force.
-
+![images](https://www.researchgate.net/publication/230853805/figure/fig1/AS:300415657758753@1448636082932/The-basic-AES-128-cryptographic-architecture.png)
 ### 2.3. Modes of Operation
 AES/DES only encrypt a single, fixed-size block. To encrypt longer data, they require a "mode of operation," which is often the source of real-world vulnerabilities.
 * **ECB (Electronic Codebook):** Insecure. Leaks data patterns.
 * **CBC (Cipher Block Chaining):** Requires a random IV and, critically, careful padding handling. If not, it is vulnerable to **Padding Oracle attacks**.
 * **GCM (Galois/Counter Mode):** An AEAD (Authenticated Encryption) mode. It is fast and secure, *BUT* it is **catastrophic if a Nonce (IV) is reused**. Reusing a nonce with the same key leads to a complete loss of confidentiality and integrity.
-
 ---
 
 ## 3. Real-World Weaknesses & Attack Vectors
@@ -64,7 +63,7 @@ This project will implement safe Proof-of-Concepts (PoCs) in a lab environment t
 * **Experiment B — Padding Oracle (AES-CBC):** Deploy a deliberately vulnerable web API and write a script (e.g., padbuster-style) to automatically decrypt a secret token.
 * **Experiment C — GCM Nonce Reuse:** Simulate nonce reuse in AES-GCM and demonstrate how an attacker can recover plaintext or forge a message.
 * **Experiment D — Cache-Timing PoC (Flush+Reload):** Set up a "spy" process and a "victim" process (using a vulnerable OpenSSL version) on the same machine to perform a Flush+Reload attack and recover bytes of the AES key.
-
+* **Experiment E — Fault Attack (DFA) on AES:** if lab allows, use glitching/fault injection to create faulty ciphertexts and attempt key recovery for reduced rounds; discuss constraints and ethics.
 ---
 
 ## 5. Tools & Implementation

@@ -1,10 +1,21 @@
 FROM python:3.10-alpine
+
+# Install socat
 RUN apk add --no-cache --update socat
 
 WORKDIR /chal
-COPY experiments/exp_padding_oracle/requirements.txt /chal/
-COPY experiments/exp_padding_oracle/vuln.py /chal/
 
-RUN pip3 install -r requirements.txt
+# --- Setup Lab 1 (Padding Oracle) ---
+RUN mkdir -p /chal/oracle
+COPY experiments/exp_padding_oracle/requirements.txt /chal/oracle/
+COPY experiments/exp_padding_oracle/vuln.py /chal/oracle/vuln.py
 
-ENTRYPOINT ["socat", "-t", "900", "-T", "120", "TCP4-LISTEN:1337,reuseaddr,fork", "EXEC:env PYTHONUNBUFFERED=1 python3 /chal/vuln.py"]
+# --- Setup Lab 2 (GCM Nonce) ---
+RUN mkdir -p /chal/gcm
+COPY experiments/exp_gcm_nonce_reuse/requirements.txt /chal/gcm/
+COPY experiments/exp_gcm_nonce_reuse/vuln.py /chal/gcm/vuln.py
+
+# --- Install Requirements ---
+# We install dependencies for both labs
+RUN pip3 install -r /chal/oracle/requirements.txt
+RUN pip3 install -r /chal/gcm/requirements.txt

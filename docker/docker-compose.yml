@@ -1,11 +1,25 @@
-version: '3'
+version: "3"
 services:
-  service:
+  lab_pad:
     build:
       context: ../
       dockerfile: docker/Dockerfile
+    container_name: lab_PO
     restart: always
     volumes:
       - ../experiments/exp_padding_oracle/flag:/flag
     ports:
       - 1337:1337
+    command: socat -t 900 -T 120 TCP4-LISTEN:1337,reuseaddr,fork EXEC:"python3 -u /chal/oracle/vuln.py"
+
+  lab_gcm:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: lab_GCM
+    restart: always
+    volumes:
+      - ../experiments/exp_gcm_nonce_reuse/flag:/flag
+    ports:
+      - 21337:1337
+    command: socat -t 900 -T 120 TCP4-LISTEN:1337,reuseaddr,fork EXEC:"python3 -u /chal/gcm/vuln.py"

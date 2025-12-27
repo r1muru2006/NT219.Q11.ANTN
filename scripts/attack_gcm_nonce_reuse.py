@@ -4,6 +4,8 @@ from Crypto.Util.Padding import pad
 from sage.all import *
 from pwn import *
 import struct
+import time
+
 
 def bytes_to_polynomial(block, a):
     poly = 0
@@ -38,6 +40,7 @@ R, x = PolynomialRing(F, name="x").objgen()
 io = remote("localhost", 21337)
 # io = process(['python3', '/home/r1muru/NT219.Q11.ANTN/experiments/exp_gcm_nonce_reuse/vuln.py'])
 
+start = time.time()
 def enc_msg(plaintext):
     io.sendlineafter(b"Select option: ", b"1")
     io.sendlineafter(b"Enter the plaintext: ", plaintext.hex().encode())
@@ -98,12 +101,13 @@ C3_p = [bytes_to_polynomial(C3[i], a) for i in range(len(C3))]
 T1_p = bytes_to_polynomial(T1, a)
 T2_p = bytes_to_polynomial(T2, a)
 L_p = bytes_to_polynomial(L, a)
-# Here G_1 is already modified to include the tag
+
 G_1 = (C1_p[0] * x**3) + (C1_p[1] * x**2) + (L_p * x) + T1_p
 G_2 = (C2_p[0] * x**3) + (C2_p[1] * x**2) + (L_p * x) + T2_p
 G_3 = (C3_p[0] * x**3) + (C3_p[1] * x**2) + (L_p * x)
 P = G_1 + G_2
 auth_keys = [r for r, _ in P.roots()]
+counts = 3
 for H, _ in P.roots():
     EJ = G_1(H)
     T3 = G_3(H) + EJ
@@ -112,8 +116,14 @@ for H, _ in P.roots():
     print(f"Calculated tag: {calc_tag.hex()}")
     try:
         plaintext = dec_msg(C3[0] + C3[1], calc_tag)
-        print(f"Decrypted: {plaintext.hex()}")
+        counts += 1
         print(f"\nPLAINTEXT: {plaintext.decode()}")
+        break
     except:
-        print(f"Decryption failed")
+        print("Decryption failed")
         continue
+
+end = time.time()
+finish_time = end - start
+print(f"Total Requests: {counts} requests")
+print(f"Wall Time: {(finish_time):.4f} seconds\n")

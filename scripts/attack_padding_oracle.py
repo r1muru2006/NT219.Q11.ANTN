@@ -1,12 +1,9 @@
-# -------------------LIBRARY-------------------
 from pwn import *
 import time
 
-# -------------------HIDDEN WARNING-------------------
 import warnings
 warnings.filterwarnings("ignore", category=BytesWarning)
 
-# -------------------CORE ATTACK-------------------
 
 BLOCK_SIZE = 16
 COUNT = 0
@@ -50,8 +47,7 @@ def full_attack(iv, ciphertext, oracle):
     return plaintext, finish_time
 
 
-# -------------------CONNECT AND ATTACK-------------------
-context.log_level = "info"  # set debug if need check
+context.log_level = "info"
 
 HOST = "127.0.0.1"
 PORT = 1337

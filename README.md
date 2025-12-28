@@ -89,3 +89,11 @@ The experimental results will lead to critical operational recommendations:
 3.  **Use "Constant-Time" Implementations:** Avoid custom crypto or old libraries. Prefer libraries that use **AES-NI** (hardware AES instructions on modern CPUs), which are designed to resist timing and cache-based side-channel attacks.
 4.  **Do Not Leak Error Details:** Never reveal information about *why* a decryption failed. Handle padding errors, MAC failures, etc., with a single, generic error message in constant time to prevent padding oracles.
 5.  **Key Management:** Use a Key Management System (KMS) or Hardware Security Module (HSM) to store and rotate keys. Never hard-code keys in applications or firmware.
+
+## Reference
+- Wikipedia - Padding Oracle Attack (https://en.wikipedia.org/wiki/Padding_oracle_attack)
+- Cryptopals: Exploiting CBC Padding Oracles By Eli Sohl, 17 February 2021 (https://www.nccgroup.com/research-blog/cryptopals-exploiting-cbc-padding-oracles)
+- Juliano Rizzo, Thai Duong, “Practical Padding Oracle Attacks” (https://www.usenix.org/legacy/event/woot10/tech/full_papers/Rizzo.pdf)
+- Wikipedia - Galois/Counter Mode (https://en.wikipedia.org/wiki/Galois/Counter_Mode)
+- Hanno Böck, Aaron Zauner, Sean Devlin, Juraj Somorovsky, and Philipp Jovanovic, Nonce-Disrespecting Adversaries: Practical Forgery Attacks on GCM in TLS (https://eprint.iacr.org/2016/475.pdf)
+- AES-GCM and breaking it on nonce reuse (https://frereit.de/aes_gcm/)

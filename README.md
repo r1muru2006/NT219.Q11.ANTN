@@ -19,7 +19,7 @@
 
 ## 2. Proposed solution
 ### Solution architecture
-
+![images](./docs/overview.png)
 ### 2.1. DES (Data Encryption Standard)
 * **Structure:** Feistel Network.
 * **Key:** 56-bit (effective).
@@ -70,14 +70,13 @@ This project will implement safe Proof-of-Concepts (PoCs) in a lab environment t
 * **Experiment B — Padding Oracle (AES-CBC):** Deploy a deliberately vulnerable web API and write a script (e.g., padbuster-style) to automatically decrypt a secret token.
 * **Experiment C — GCM Nonce Reuse:** Simulate nonce reuse in AES-GCM and demonstrate how an attacker can recover plaintext or forge a message.
 * **Experiment D — Cache-Timing PoC (Flush+Reload):** Set up a "spy" process and a "victim" process (using a vulnerable OpenSSL version) on the same machine to perform a Flush+Reload attack and recover bytes of the AES key.
-* **Experiment E — Fault Attack (DFA) on AES:** if lab allows, use glitching/fault injection to create faulty ciphertexts and attempt key recovery for reduced rounds; discuss constraints and ethics.
 ---
 
 ## 5. Tools & Implementation
 
-* **Software:** OpenSSL (various versions), Python (with `pycryptodome`), Hashcat, PoC scripts for padding oracles, PoC scripts for cache-timing.
-* **Hardware (Recommended):** GPU (NVIDIA) for brute-force, IoT boards (ESP32/STM32), ChipWhisperer for side-channel analysis.
-* **Environment:** Docker (for containerizing vulnerable services), VMs (for multi-tenancy experiments).
+* **Software:** OpenSSL (various versions), Python (with `pycryptodome`, `sagemath`).
+* **Hardware (Recommended):** GPU (NVIDIA) for brute-force.
+* **Environment:** Docker (for containerizing vulnerable services).
 
 ---
 

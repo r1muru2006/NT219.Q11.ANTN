@@ -32,7 +32,7 @@
 * **Key:** 128, 192, or 256-bit.
 * **Block:** 128-bit.
 * **Strength:** Theoretically, no practical attack against full-round AES is more efficient than brute-force.
-![images](https://www.geeksforgeeks.org/computer-networks/advanced-encryption-standard-aes/)
+![images](./docs/AES.png)
 
 ### 2.3. Modes of Operation
 AES/DES only encrypt a single, fixed-size block. To encrypt longer data, they require a "mode of operation," which is often the source of real-world vulnerabilities.

@@ -10,13 +10,15 @@
 
 ## 1. Overview
 
-Symmetric-key cryptography is the foundation of modern data confidentiality. **DES (Data Encryption Standard)**, while obsolete, provides critical lessons, and its variants like **3DES** still persist in legacy systems. Its successor, **AES (Advanced Encryption Standard)**, is the current global standard, protecting everything from banking transactions (TLS) to cloud data and IoT devices.
+- Scenario: A financial institution is undergoing a critical infrastructure upgrade. They possess legacy databases encrypted with DES and are migrating to an AES-256 standard. They need to conduct a cryptanalytic audit to demonstrate the immediate risks of the legacy DES data to stakeholders and validate the resilience of the new AES implementation against modern attack vectors.
 
-In practice, however, **AES is rarely broken by its underlying mathematics**. Successful attacks almost always target **implementation flaws**, **misconfigurations**, and **side-channel leaks**. This project conducts an experimental cryptanalysis, focusing not just on classic attacks (like brute-force) but on these practical, real-world vectors (like Padding Oracles, GCM nonce reuse, and cache-timing attacks) to assess risk in specific deployment scenarios.
+- Gaps: DES is computationally insecure by modern standards due to its short 56-bit key length, making it highly susceptible to brute-force attacks and linear cryptanalysis. While AES is robust, it can still be vulnerable to implementation flaws, such as using weak modes of operation (e.g., ECB) or side-channel attacks (e.g., power analysis) if not deployed correctly.
 
+- Motivations: To justify the resources required for a complete migration from legacy systems, ensure compliance with strict data protection regulations (like PCI-DSS), and guarantee the long-term confidentiality of sensitive client financial data.
 ---
 
-## 2. Algorithmic Background & Modes of Operation
+## 2. Proposed solution
+### Solution architecture
 
 ### 2.1. DES (Data Encryption Standard)
 * **Structure:** Feistel Network.
@@ -24,17 +26,22 @@ In practice, however, **AES is rarely broken by its underlying mathematics**. Su
 * **Block:** 64-bit.
 * **Issues:** The 56-bit key size is trivially **vulnerable to brute-force** by modern hardware. The 64-bit block size is also a weakness, leading to "Sweet32" collision attacks on 3DES when encrypting large amounts of data.
 ![images](https://www.zenarmor.com/docs/assets/images/3-3d35f2c1cf731b1f458799f4b0d5338e.png)
+
 ### 2.2. AES (Advanced Encryption Standard)
 * **Structure:** Substitution-Permutation Network (SPN).
 * **Key:** 128, 192, or 256-bit.
 * **Block:** 128-bit.
 * **Strength:** Theoretically, no practical attack against full-round AES is more efficient than brute-force.
-![images](https://www.researchgate.net/publication/230853805/figure/fig1/AS:300415657758753@1448636082932/The-basic-AES-128-cryptographic-architecture.png)
+![images](https://www.geeksforgeeks.org/computer-networks/advanced-encryption-standard-aes/)
+
 ### 2.3. Modes of Operation
 AES/DES only encrypt a single, fixed-size block. To encrypt longer data, they require a "mode of operation," which is often the source of real-world vulnerabilities.
 * **ECB (Electronic Codebook):** Insecure. Leaks data patterns.
+![images](./docs/ECB.png)
 * **CBC (Cipher Block Chaining):** Requires a random IV and, critically, careful padding handling. If not, it is vulnerable to **Padding Oracle attacks**.
+![images](./docs/CBC.png)
 * **GCM (Galois/Counter Mode):** An AEAD (Authenticated Encryption) mode. It is fast and secure, *BUT* it is **catastrophic if a Nonce (IV) is reused**. Reusing a nonce with the same key leads to a complete loss of confidentiality and integrity.
+![images](./docs/GCM.png)
 ---
 
 ## 3. Real-World Weaknesses & Attack Vectors

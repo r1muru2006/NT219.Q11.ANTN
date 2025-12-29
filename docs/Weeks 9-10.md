@@ -52,7 +52,7 @@ The PoC utilizes a Client-Server architecture over UDP to minimize protocol over
 
 This server uses OpenSSL for the actual encryption but injects an artificial delay to simulate a vulnerable hardware target.
 
-C
+```c
 
 // aes\_server.c \- Real AES Timing Vulnerable Server  
 \#include \<stdio.h\>  
@@ -130,13 +130,12 @@ int main() {
     close(sockfd);  
     return 0;  
 }
-
+```
 ### **3.2 Attacker Client Code (client.c)**
 
 This client connects to the server, measures the RTT, and recovers the key using Correlation Analysis.
 
-C
-
+```c
 // client.c \- Advanced Timing Attack Client  
 \#include \<stdio.h\>  
 \#include \<stdlib.h\>  
@@ -313,6 +312,7 @@ int main(int argc, char \*argv\[\]) {
     close(sockfd);  
     return 0;  
 }
+```
 
 ## ---
 

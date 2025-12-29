@@ -330,3 +330,8 @@ Upon running the attack script, the client successfully recovers the key byte-by
 * **Accuracy:** 100% recovery of the 128-bit key in a simulated environment.  
 * **Performance:** The attack recovers the full key in minutes/hours depending on the sample size (samples\_per\_value).  
 * **Conclusion:** This simulation proves that if an algorithm's execution time correlates linearly with intermediate values (like S-Box outputs), Correlation Timing Analysis is a highly effective extraction method.
+
+**5\. Reference**
+- https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
+- https://fc12.ifca.ai/pre-proceedings/paper_70.pdf
+- https://www.microsoft.com/en-us/research/wp-content/uploads/2006/10/aes-timing.pdf

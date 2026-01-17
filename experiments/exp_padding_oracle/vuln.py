@@ -26,8 +26,8 @@ def challenge():
             return
         
         pt = cbc_decrypt(ct)
-        if pt.decode(errors='ignore') == FLAG:
-            print(f"Correct! Here is your flag: {FLAG}")
+        if pt.decode(errors='ignore').encode() == FLAG:
+            print(f"Correct!!!")
         else:
             print("Nope, try again!")
     except ValueError:

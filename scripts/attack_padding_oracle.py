@@ -67,8 +67,6 @@ def check_service(iv, ct):
     data = io.recvline().strip().decode()
     if "FAIL" in data:
         return False
-    elif "Correct!" in data:
-        print(data)
     return True
 
 

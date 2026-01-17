@@ -6,7 +6,6 @@ import sys
 KEY = os.urandom(16)
 NONCE = os.urandom(16)
 flag = open("/flag", "rb").read()
-# flag = 'FLAG{Th1s_1s_4_t3st_fl4g_f0r_GCM_n0nc3_r3us3_exper1m3nt}'.encode()
 
 def encrypt():
     plaintext = bytes.fromhex(input("Enter the plaintext: "))

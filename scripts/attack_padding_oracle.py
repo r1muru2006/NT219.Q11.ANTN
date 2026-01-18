@@ -14,7 +14,6 @@ def unpad(data, blocksize=BLOCK_SIZE):
         return data[:-pad_len]
     return data
 
-    
 
 def single_block_attack(iv, ciphertext, oracle):
     after_decrypt = b""
